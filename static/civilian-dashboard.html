@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Civilian Dashboard</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@700&family=Poppins:wght@700&display=swap"
+    rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #e0f7fa, #ffffff);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(90deg, #044ab3, #020507);
+      padding: 0.8rem 1rem;
+    }
+
+
+    .nav-link,
+    .navbar-text {
+      color: #fff !important;
+      font-weight: 500;
+    }
+
+    .navbar-brand {
+      font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+
+      /* Shiny gradient */
+      background: linear-gradient(90deg, #ffffff, #dcdcdc, #f5f5f5, #ffffff);
+      background-size: 300% auto;
+
+      /* Clip text for gradient */
+      background-clip: text;
+      color: transparent;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      transition: transform 0.2s ease-in-out;
+
+      /* Animation */
+      animation: shine 3s linear infinite;
+    }
+
+    @keyframes shine {
+      0% {
+        background-position: 0% center;
+      }
+
+      100% {
+        background-position: 100% center;
+      }
+    }
+
+
+    .navbar-brand:hover {
+      transform: scale(1.08);
+    }
+
+    #logoutBtn {
+      border-radius: 20px;
+      padding: 5px 15px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #logoutBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Toggle Buttons */
+    .toggle-btns {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .toggle-btns .btn {
+      border-radius: 30px;
+      margin: 0 10px;
+      padding: 10px 20px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .toggle-btns .btn.active {
+      background: #003366;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transform: scale(1.05);
+    }
+
+    /* Sections */
+    .content-section {
+      display: none;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Card Styles */
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Chart Container */
+    .chart-container {
+      background: #ffffff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* Buttons */
+    .btn-primary,
+    .btn-success,
+    .btn-outline-primary,
+    .btn-outline-success {
+      border-radius: 50px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover,
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline-primary:hover,
+    .btn-outline-success:hover {
+      color: #fff !important;
+      background-color: #1e3c72 !important;
+      border-color: #1e3c72 !important;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Form Inputs */
+    .form-control,
+    .form-select {
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #1e3c72;
+      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    }
+
+    /* Tables */
+    table.table {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      background: #fff;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    table.table thead {
+      background: linear-gradient(90deg, #003366, #1e3c72);
+      color: #fff;
+    }
+
+    table.table tbody tr:hover {
+      background-color: rgba(30, 60, 114, 0.05);
+      transform: scale(1.01);
+      transition: all 0.2s ease;
+    }
+
+    /* Modal */
+    .modal-content {
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    /* Headings */
+    h4,
+    h5,
+    h2 {
+      font-weight: 500;
+      position: relative;
+    }
+
+    h4::after,
+    h5::after {
+      content: "";
+      display: block;
+      width: 50px;
+      height: 3px;
+      background: #1e3c72;
+      margin-top: 5px;
+      border-radius: 2px;
+    }
+
+    /* Search input + buttons */
+    #searchConstituency,
+    #searchBtn {
+      transition: all 0.3s ease;
+    }
+
+    #searchBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(30, 60, 114, 0.2);
+    }
+
+    /* Responsive tweaks */
+    @media(max-width: 768px) {
+      .chart-container {
+        height: auto;
+      }
+
+      .card {
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#"><i class="bi bi-bank2 me-2"></i>प्रगति-Path</a>
+      <button id="logoutBtn" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
+    </div>
+  </nav>
+
+  <!-- Toggle Buttons -->
+  <div class="toggle-btns">
+    <button class="btn btn-outline-primary active" onclick="showSection('report')">Report an Issue</button>
+    <button class="btn btn-outline-success" onclick="showSection('issues')">Reported Issues</button>
+    <button class="btn btn-outline-info" onclick="showSection('track')">Track Your Complaints</button>
+  </div>
+
+  <!--for reporting your issue-->
+  <div id="report" class="container content-section active">
+    <div class="row g-4">
+      <div class="col-lg-12">
+        <div class="card p-4 mb-4">
+          <h4 class="mb-3 text-primary">Report an Issue</h4>
+          <form id="reportForm" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label class="form-label">Issue Title</label>
+              <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="category" name="category" required>
+                <option value="">Select Category</option>
+                <option>Road</option>
+                <option>Water</option>
+                <option>Electricity</option>
+                <option>Sanitation</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Constituency</label>
+              <input type="text" class="form-control" id="constituency" name="constituency"
+                placeholder="e.g. South Delhi" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Your UID</label>
+              <input type="text" class="form-control" id="uid" name="uid"
+                placeholder="Enter your UID (needed for tracking your complaint later)" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Location (optional)</label>
+              <input type="text" class="form-control" id="location" name="location">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Upload Photo</label>
+              <input type="file" class="form-control" id="image_file" name="image_file" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Submit Issue</button>
+          </form>
+          <div id="formMessage" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--Reported issues vala content and chart-->
+  <div id="issues" class="container content-section">
+    <div class="row g-4">
+      <div class="col-lg-12">
+        <div class="card p-4 mb-4">
+          <h4 class="mb-3 text-success">Reported Issues</h4>
+          <input type="text" id="searchConstituency" class="form-control mb-3" placeholder="Enter Constituency">
+          <button type="button" id="searchBtn" class="btn btn-success mb-3">Search</button>
+          <table class="table table-striped" id="issuesTable">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Constituency</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+
+        <div class="chart-container">
+          <h5 class="text-center">Issues Chart</h5>
+          <div class="d-flex justify-content-center mb-3">
+            <button id="btnByConstituency" class="btn btn-outline-success me-2">By Constituency</button>
+            <button id="btnByCategory" class="btn btn-outline-primary">By Category</button>
+          </div>
+          <canvas id="issuesChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complaints track krne ke lie-->
+  <div id="track" class="container content-section">
+    <div class="card p-4 mb-4">
+      <h4 class="mb-3 text-info">Complaint Tracker</h4>
+
+      <!-- UID input -->
+      <div class="mb-3">
+        <label class="form-label">Enter UID</label>
+        <input type="text" id="uidSearch" class="form-control" placeholder="Enter your UID">
+      </div>
+      <button type="button" id="trackerSearchBtn" class="btn btn-primary mb-3">Search</button>
+
+      <!-- Complaints Table -->
+      <table class="table table-bordered" id="trackerTable">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Acknowledged</th>
+            <th>View More</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- View More Modal -->
+    <div class="modal fade" id="viewMoreModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content p-3">
+          <h5>Issue Details</h5>
+          <div id="modalContent"></div>
+          <div class="text-end mt-3">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ====== CONFIG ======
+    const API_BASE_URL = "http://127.0.0.1:5000"; // change if your backend runs elsewhere
+
+    // ====== DOM ======
+    const form = document.getElementById("reportForm");
+    const formMessage = document.getElementById("formMessage");
+    const issuesTableBody = document.querySelector("#issuesTable tbody");
+    const searchInput = document.getElementById("searchConstituency");
+    const searchBtn = document.getElementById("searchBtn");
+    const ctx = document.getElementById("issuesChart").getContext("2d");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    //for toggle buttons functionality
+    function showSection(id) {
+      document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.toggle-btns .btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // ====== state ======
+    let chart = null;
+    let chartMode = "category"; // 'category' = categories for current constituency, 'constituency' = aggregated constituencies
+    let currentConstituency = "";
+    let currentIssues = [];
+
+    // ====== small helpers ======
+    function escapeHtml(s) {
+      if (s === null || s === undefined) return "";
+      return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    async function safeJsonResponse(res) {
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        return res.json();
+      }
+      // fallback
+      const txt = await res.text();
+      try {
+        return JSON.parse(txt);
+      } catch {
+        return { message: txt || "No JSON body" };
+      }
+    }
+
+    // ====== Report form submit ======
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      formMessage.textContent = "";
+      const formData = new FormData(form);
+      const constituencyVal = (formData.get("constituency") || "").trim();
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/report_issue`, { method: "POST", body: formData });
+        const body = await safeJsonResponse(res);
+        if (res.ok) {
+          let feedback = "";
+          if (body.validation) {
+              if ('image_valid' in body.validation)
+                  feedback += `<br><b>Image Validation:</b> ${body.validation.image_valid ? "Passed" : "Failed"}<br>`;
+              if (body.validation.image_msg)
+                  feedback += `<b>Image Message:</b> ${escapeHtml(body.validation.image_msg)}<br>`;
+              if (body.validation.florence_caption)
+                  feedback += `<b>Florence Caption:</b> ${escapeHtml(body.validation.florence_caption)}<br>`;
+              if (body.validation.civic_score)
+                  feedback += `<b>Civic Score:</b> ${escapeHtml(body.validation.civic_score)}<br>`;
+          }
+          formMessage.innerHTML = `<div class="alert alert-success">${escapeHtml(body.message || "Submitted")}</div>`;
+          form.reset();
+          if (constituencyVal) {
+            currentConstituency = constituencyVal;
+            await fetchIssues(currentConstituency);
+          }
+        } else {
+          formMessage.innerHTML = `<div class="alert alert-danger">Error ${res.status}: ${escapeHtml(body.message || JSON.stringify(body))}</div>`;
+        }
+      } catch (err) {
+        console.error("Network error on submit:", err);
+        formMessage.innerHTML = `<div class="alert alert-danger">Network error: ${escapeHtml(err.message || err)}</div>`;
+      }
+    });
+
+    // ====== fetch issues for a constituency ======
+    async function fetchIssues(constituency) {
+      if (!constituency) return;
+      try {
+        console.log("Fetching issues for:", constituency);
+        const res = await fetch(`${API_BASE_URL}/issues/${encodeURIComponent(constituency)}`);
+        let data;
+        try {
+          data = await res.json();
+        } catch (err) {
+          console.error("Failed to parse /issues response as JSON:", err);
+          const t = await res.text();
+          console.error("Response text:", t);
+          return;
+        }
+        if (!res.ok) {
+          console.error("Server error (issues):", data);
+          return;
+        }
+
+        currentIssues = Array.isArray(data.issues) ? data.issues.slice() : [];
+        // ❌ don't sort here → keep table stable
+
+        renderTable();
+        updateChartFromIssues();
+      } catch (err) {
+        console.error("Fetch issues error:", err);
+        if (err instanceof TypeError) console.warn("Check backend is running and CORS is allowed.");
+      }
+    }
+
+    // ====== render table ======
+    function renderTable() {
+      issuesTableBody.innerHTML = "";
+      currentIssues.forEach((issue) => {
+        const date = issue.created_at ? new Date(issue.created_at).toLocaleString() : "-";
+        const idSafe = escapeHtml(issue.id);
+        const rowHTML = `
+        <tr data-issue-id="${idSafe}" data-category="${escapeHtml(issue.category || "")}">
+          <td>
+            ${escapeHtml(issue.title)}
+            <br>
+            <small>
+              Upvotes: <span id="upvote-${idSafe}">${escapeHtml(issue.upvotes)}</span>
+              <button type="button" class="btn btn-sm btn-outline-primary ms-2 upvote-btn" data-issue-id="${idSafe}">Upvote</button>
+            </small>
+          </td>
+          <td>${escapeHtml(issue.category)}</td>
+          <td>${escapeHtml(issue.constituency)}</td>
+          <td>${escapeHtml(date)}</td>
+        </tr>
+      `;
+        issuesTableBody.insertAdjacentHTML("beforeend", rowHTML);
+      });
+    }
+
+    // ====== upvote (event delegation) ======
+    issuesTableBody.addEventListener("click", async (e) => {
+      const btn = e.target.closest(".upvote-btn");
+      if (!btn) return;
+      const issueId = btn.dataset.issueId;
+      if (!issueId) return;
+      btn.disabled = true;
+      try {
+        const res = await fetch(`${API_BASE_URL}/upvote/${encodeURIComponent(issueId)}`, { method: "POST" });
+        const body = await safeJsonResponse(res);
+        if (!res.ok) {
+          console.error("Upvote failed:", body);
+          return;
+        }
+
+        // update DOM span only (no re-sorting)
+        const upvoteSpan = document.getElementById(`upvote-${issueId}`);
+        if (upvoteSpan) upvoteSpan.textContent = body.upvotes;
+
+        // update local currentIssues
+        const local = currentIssues.find((i) => String(i.id) === String(issueId));
+        if (local) local.upvotes = Number(body.upvotes);
+
+        updateChartFromIssues();
+      } catch (err) {
+        console.error("Upvote network error:", err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ====== chart helpers ======
+    function updateChartFromIssues() {
+      if (chartMode === "category") {
+        const categoryCount = {};
+        currentIssues.forEach((i) => {
+          const cat = (i.category || "Uncategorized").toString().trim();
+          categoryCount[cat] = (categoryCount[cat] || 0) + Number(i.upvotes || 0);
+        });
+        updateChart(categoryCount, `Upvotes by Category (${currentConstituency || "—"})`);
+      } else {
+        fetch(`${API_BASE_URL}/issues/constituency_chart`)
+          .then((res) => res.json())
+          .then((data) => {
+            const countMap = {};
+            data.forEach((row) => {
+              countMap[row.constituency] = row.total_upvotes;
+            });
+            updateChart(countMap, "Upvotes by Constituency (all)");
+          })
+          .catch((err) => console.error("Constituency chart fetch error:", err));
+      }
+    }
+
+    function updateChart(countMap, title) {
+      const labels = Object.keys(countMap);
+      const values = Object.values(countMap);
+      if (!chart) {
+        chart = new Chart(ctx, {
+          type: "bar",
+          data: { labels, datasets: [{ label: title, data: values, backgroundColor: labels.map(() => "#007bff") }] },
+          options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: title } } },
+        });
+      } else {
+        chart.data.labels = labels;
+        chart.data.datasets[0].label = title;
+        chart.data.datasets[0].data = values;
+        chart.data.datasets[0].backgroundColor = labels.map(() => "#007bff");
+        chart.options.plugins.title.text = title;
+        chart.update();
+      }
+    }
+
+    // ====== UI bindings ======
+    searchBtn.addEventListener("click", () => {
+      const c = searchInput.value.trim();
+      if (!c) return;
+      currentConstituency = c;
+      fetchIssues(c);
+    });
+    searchInput.addEventListener("keyup", (e) => {
+      if (e.key === "Enter") searchBtn.click();
+    });
+
+    document.getElementById("btnByConstituency").addEventListener("click", () => {
+      chartMode = "constituency";
+      updateChartFromIssues();
+    });
+    document.getElementById("btnByCategory").addEventListener("click", () => {
+      chartMode = "category";
+      updateChartFromIssues();
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        const resp = await fetch(`${API_BASE_URL}/logout`, { method: "POST", credentials: "include" });
+        const body = await safeJsonResponse(resp);
+        if (resp.ok) {
+          alert(body.message || "Logged out");
+          window.location.href = "login.html";
+        } else {
+          alert("Logout failed: " + (body.message || JSON.stringify(body)));
+        }
+      } catch (err) {
+        console.error("Logout error:", err);
+        alert("Network error during logout");
+      }
+    });
+
+    document.getElementById("trackerSearchBtn").addEventListener("click", fetchTracker);
+
+    async function fetchTracker() {
+      const uid = document.getElementById("uidSearch").value.trim();
+      if (!uid) {
+        alert("Please enter your UID");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/issues/tracker/${uid}`);
+        const data = await res.json();
+        const tbody = document.querySelector('#trackerTable tbody');
+        tbody.innerHTML = '';
+
+        if (!data || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="3">No issues found for UID ${uid}</td></tr>`;
+          return;
+        }
+
+        data.forEach(issue => {
+          const row = document.createElement('tr');
+
+          const titleTd = document.createElement('td');
+          titleTd.textContent = issue.title;
+
+          const ackTd = document.createElement('td');
+          const ackCheckbox = document.createElement('input');
+          ackCheckbox.type = 'checkbox';
+          ackCheckbox.disabled = true;
+          ackCheckbox.checked = issue.acknowledged;
+          ackTd.appendChild(ackCheckbox);
+
+          const viewTd = document.createElement('td');
+          const viewBtn = document.createElement('button');
+          viewBtn.className = 'btn btn-sm btn-info';
+          viewBtn.textContent = 'View More';
+          viewBtn.onclick = () => showModal(issue);
+          viewTd.appendChild(viewBtn);
+
+          row.appendChild(titleTd);
+          row.appendChild(ackTd);
+          row.appendChild(viewTd);
+          tbody.appendChild(row);
+        });
+
+      } catch (err) {
+        console.error("Error fetching tracker issues:", err);
+      }
+    }
+
+
+    // Show modal with full issue details
+    function showModal(issue) {
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <p><strong>Title:</strong> ${issue.title}</p>
+        <p><strong>Description:</strong> ${issue.description}</p>
+        <p><strong>Category:</strong> ${issue.category}</p>
+        <p><strong>Constituency:</strong> ${issue.constituency}</p>
+        <p><strong>Location:</strong> ${issue.location}</p>
+        <p><strong>Upvotes:</strong> ${issue.upvotes}</p>
+        <p><strong>Assigned To:</strong> ${issue.assigned_to}</p>
+        <p><strong>Deadline:</strong> ${issue.max_deadline}</p>
+        <p><strong>Proof Photo:</strong> ${issue.proof_photo_url !== "To be done" ? `<a href="${API_BASE_URL}${issue.proof_photo_url}" target="_blank">View</a>` : "To be done"}</p>
+
+      `;
+      new bootstrap.Modal(document.getElementById('viewMoreModal')).show();
+    }
+
+    window.onload = () => {
+      const uid = document.getElementById("uidSearch").value.trim();
+      if (uid) {
+        fetchTracker();
+      }
+    };
+    console.log("Dashboard script loaded. Use search to load a constituency (e.g. mundka).");
+  </script>
+
+</body>
+
+</html>
