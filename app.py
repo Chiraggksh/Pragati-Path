@@ -11,6 +11,9 @@ from flask import send_from_directory
 from issue_validator import CivicValidator
 from flask import Flask, jsonify
 from department_analytics import DepartmentAnalytics
+
+
+
 validator = CivicValidator()
 analytics = DepartmentAnalytics()
 
@@ -20,10 +23,12 @@ app.secret_key = "supersecretkey"
 # Allow credentials and restrict origins to your frontend URL
 CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5500"])
 
+
 app.config.update(
     SESSION_COOKIE_SAMESITE="None",   # allow cross-origin
     SESSION_COOKIE_SECURE=False       # set True if using HTTPS
 )
+
 
 
 # Database setup and folders setup
@@ -111,14 +116,8 @@ def get_issues_by_uid(uid):
     except Exception as e:
         print("Tracker fetch error:", e)
         return jsonify({"message": "Internal server error"}), 500
-@app.route("/api/departmentanalytics", methods=["GET"])
-def department_analytics():
-    try:
-        data = analytics.get_comprehensive_dashboard_data()
-        return jsonify(data), 200
-    except Exception as e:
-        print(f"Department analytics fetch error: {e}")
-        return jsonify({"message": "Failed to load departmental analytics"}), 500
+    
+
 @app.route('/register', methods=['POST'])
 def register():
     """Register a new user"""
@@ -209,8 +208,7 @@ def logout():
     session.clear()
     return jsonify({'message': 'Logged out successfully'}), 200
 
-# ✅ Civilian reports an issue (no session required)
-
+# Civilian reports an issue (no session required)
 @app.route("/report_issue", methods=["POST"])
 def report_issue():
     try:
@@ -248,6 +246,7 @@ def report_issue():
                 florence_caption = validator.get_florence_caption(imagepath)
                 print(florence_caption)
                 civic_score = validator.get_civic_score_strict3(florence_caption, description)
+                print(civic_score)
             else:
                 img_msg = img_msg or "Image failed validation."
         elif image_file:
@@ -293,7 +292,7 @@ def report_issue():
         return jsonify({"message": "Internal server error"}), 500
 
 
-# ✅ Get issues by constituency (real-time fetch) (civilian-api)
+# Get issues by constituency (real-time fetch) (civilian-api)
 @app.route("/issues/<constituency>", methods=["GET"])
 def get_issues_by_constituency(constituency):
     try:
@@ -395,6 +394,8 @@ def get_issues_tracker():
 @app.route('/officer/issues', methods=['GET'])
 def get_officer_issues():
     constituency = request.args.get('constituency')
+    department = request.args.get('department')  # New
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -403,6 +404,11 @@ def get_officer_issues():
             "SELECT * FROM issues WHERE constituency = ? ORDER BY upvotes DESC",
             (constituency,)
         )
+    elif department:
+        cursor.execute(
+            "SELECT * FROM issues WHERE category = ? ORDER BY upvotes DESC",  # assuming 'category' = department
+            (department,)
+        )
     else:
         cursor.execute(
             "SELECT * FROM issues ORDER BY upvotes DESC"
@@ -410,7 +416,6 @@ def get_officer_issues():
     
     issues = cursor.fetchall()
     conn.close()
-
     return jsonify([dict(issue) for issue in issues])
 
 
@@ -463,9 +468,22 @@ def update_issue(issue_id):
 
     return jsonify({"message": "Issue updated successfully"})
 
+
+#proof photo upload vali functionality
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory('static/uploads', filename)
+
+#department full analysis vala api
+@app.route("/api/departmentanalytics", methods=["GET"])
+def department_analytics():
+    try:
+        data = analytics.get_comprehensive_dashboard_data()
+        return jsonify(data), 200
+    except Exception as e:
+        print(f"Department analytics fetch error: {e}")
+        return jsonify({"message": "Failed to load departmental analytics"}), 500
+    
 
 
 if __name__ == '__main__':
